@@ -10,7 +10,7 @@ CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 
 # Model configurations
-EMBEDDING_MODEL = "models/text-embedding-004"
+EMBEDDING_MODEL = "models/gemini-embedding-001"
 GENERATIVE_MODEL = "gemini-2.5-flash"
 
 # Ensure directories exist
