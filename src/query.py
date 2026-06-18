@@ -1,7 +1,7 @@
 import os
 import google.generativeai as genai
 import chromadb
-from chromadb.utils.embedding_functions import GoogleGenerativeAiEmbeddingFunction
+from chromadb import EmbeddingFunction, Documents, Embeddings
 from dotenv import load_dotenv
 
 # Import configurations
@@ -13,6 +13,24 @@ api_key = os.getenv("GEMINI_API_KEY")
 
 if api_key:
     genai.configure(api_key=api_key)
+
+class GeminiEmbeddingFunction(EmbeddingFunction):
+    def __init__(self, api_key: str, model_name: str = "models/text-embedding-004", task_type: str = "retrieval_query"):
+        self.model_name = model_name
+        self.task_type = task_type
+        genai.configure(api_key=api_key)
+        
+    def __call__(self, input: Documents) -> Embeddings:
+        try:
+            response = genai.embed_content(
+                model=self.model_name,
+                content=input,
+                task_type=self.task_type
+            )
+            return response['embedding']
+        except Exception as e:
+            print(f"Error in GeminiEmbeddingFunction: {e}")
+            raise e
 
 def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
     """
@@ -30,9 +48,10 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
     client = chromadb.PersistentClient(path=DB_DIR)
     
     # Initialize the same Gemini embedding function used in ingestion
-    embedding_fn = GoogleGenerativeAiEmbeddingFunction(
+    embedding_fn = GeminiEmbeddingFunction(
         api_key=api_key,
-        model_name=EMBEDDING_MODEL
+        model_name=EMBEDDING_MODEL,
+        task_type="retrieval_query"
     )
     
     # Load collection
