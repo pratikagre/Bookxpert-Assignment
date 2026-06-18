@@ -204,7 +204,7 @@ st.markdown("""
 # Main Page Header
 st.markdown("""
 <div class="header-container">
-    <div class="main-header">Talk-a-Tive Document Q&A Bot</div>
+    <div class="main-header">Document Q&A Bot</div>
     <div class="sub-header">Retrieval-Augmented Generation (RAG) powered by ChromaDB & Google Gemini</div>
 </div>
 """, unsafe_allow_html=True)
