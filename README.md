@@ -1,4 +1,4 @@
-# Talk-a-Tive: Grounded Document Q&A Bot with RAG
+#  Grounded Document Q&A Bot with RAG
 
 Talk-a-Tive is a Retrieval-Augmented Generation (RAG) system built from scratch in Python to answer natural language questions against a custom document collection. By integrating text extraction from diverse file formats (PDF, DOCX, TXT) with semantic vector search (ChromaDB) and Google Gemini large language models, the bot delivers highly accurate, context-grounded answers accompanied by precise, inline source citations.
 
