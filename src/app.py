@@ -37,40 +37,92 @@ st.markdown("""
         font-weight: 700;
         letter-spacing: -0.02em;
     }
+
+    /* Main App Gradient Background */
+    [data-testid="stAppViewContainer"] {
+        background: linear-gradient(135deg, #090514 0%, #0c0d21 45%, #050716 100%) !important;
+        background-attachment: fixed !important;
+    }
+    
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: rgba(10, 11, 22, 0.75) !important;
+        backdrop-filter: blur(15px) !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* Text Input Customization */
+    div[data-testid="stTextInput"] input {
+        background-color: rgba(22, 24, 47, 0.6) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        color: #f1f5f9 !important;
+        border-radius: 12px !important;
+        backdrop-filter: blur(10px) !important;
+        padding: 0.6rem 1rem !important;
+        transition: all 0.3s ease !important;
+    }
+    div[data-testid="stTextInput"] input:focus {
+        border-color: #c084fc !important;
+        box-shadow: 0 0 15px rgba(192, 132, 252, 0.3) !important;
+        background-color: rgba(22, 24, 47, 0.8) !important;
+    }
+
+    /* Button Styling */
+    div.stButton > button {
+        background: linear-gradient(135deg, #c084fc 0%, #60a5fa 100%) !important;
+        color: #0c0d21 !important;
+        border: none !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        padding: 0.5rem 1.5rem !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 15px rgba(192, 132, 252, 0.2) !important;
+    }
+    div.stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(192, 132, 252, 0.45) !important;
+        color: #ffffff !important;
+    }
+    div.stButton > button:active {
+        transform: translateY(0) !important;
+    }
     
     /* Header Gradient */
     .header-container {
         text-align: center;
-        padding: 2rem 0;
+        padding: 2.5rem 0 1.5rem 0;
     }
     .main-header {
-        background: linear-gradient(135deg, #c084fc 0%, #60a5fa 100%);
+        background: linear-gradient(135deg, #d8b4fe 0%, #818cf8 50%, #60a5fa 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 3rem;
+        font-size: 3.2rem;
         font-weight: 800;
         margin-bottom: 0.5rem;
+        letter-spacing: -0.03em;
     }
     .sub-header {
         color: #94a3b8;
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         margin-bottom: 2rem;
         font-weight: 400;
     }
     
     /* Glassmorphic Cards */
     .glass-card {
-        background: rgba(30, 41, 59, 0.45);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        backdrop-filter: blur(12px);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        background: rgba(22, 24, 47, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 16px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        backdrop-filter: blur(16px) !important;
+        box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.3) !important;
+        color: #e2e8f0 !important;
+        line-height: 1.7 !important;
     }
     
     .source-card {
-        background: rgba(15, 23, 42, 0.35);
+        background: rgba(12, 13, 27, 0.35);
         border-left: 4px solid #c084fc;
         border-top: 1px solid rgba(255, 255, 255, 0.03);
         border-right: 1px solid rgba(255, 255, 255, 0.03);
@@ -79,12 +131,14 @@ st.markdown("""
         padding: 1.2rem;
         margin-bottom: 1rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(8px);
     }
     
     .source-card:hover {
         border-left-color: #60a5fa;
         transform: translateX(4px);
-        background: rgba(15, 23, 42, 0.5);
+        background: rgba(12, 13, 27, 0.55);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
     
     /* Badges */
@@ -100,26 +154,26 @@ st.markdown("""
         align-items: center;
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.02em;
     }
     
     .badge-similarity {
         background-color: rgba(96, 165, 250, 0.12);
-        color: #3b82f6;
+        color: #60a5fa;
         border: 1px solid rgba(96, 165, 250, 0.25);
     }
     
     .badge-source {
         background-color: rgba(192, 132, 252, 0.12);
-        color: #a855f7;
+        color: #c084fc;
         border: 1px solid rgba(192, 132, 252, 0.25);
     }
     
     .badge-location {
         background-color: rgba(52, 211, 153, 0.12);
-        color: #10b981;
+        color: #34d399;
         border: 1px solid rgba(52, 211, 153, 0.25);
     }
     
@@ -129,14 +183,14 @@ st.markdown("""
         font-weight: 700;
         margin-bottom: 1rem;
         color: #f1f5f9;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         padding-bottom: 0.5rem;
     }
     
     .file-item {
         font-size: 0.85rem;
         color: #94a3b8;
-        padding: 0.25rem 0;
+        padding: 0.3rem 0;
         display: flex;
         align-items: center;
     }
