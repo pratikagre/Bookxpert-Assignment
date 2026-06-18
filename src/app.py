@@ -40,7 +40,7 @@ st.markdown("""
 
     /* Main App Gradient Background */
     [data-testid="stAppViewContainer"] {
-        background: linear-gradient(135deg, #090514 0%, #0c0d21 45%, #050716 100%) !important;
+        background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 60%, #020617 100%) !important;
         background-attachment: fixed !important;
     }
     
