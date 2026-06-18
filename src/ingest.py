@@ -331,7 +331,7 @@ def load_documents_from_folder(folder_path: str) -> list[dict]:
     
     for file in files:
         file_path = os.path.join(folder_path, file)
-        ext = os.path.splitext(file).lower()[1]
+        ext = os.path.splitext(file)[1].lower()
         
         if ext == 'pdf':
             print(f"Parsing PDF: {file}")
