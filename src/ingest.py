@@ -7,10 +7,8 @@ from pypdf import PdfReader
 from dotenv import load_dotenv
 from tqdm import tqdm
 
-# Import configuration
 from src.config import DATA_DIR, DB_DIR, CHUNK_SIZE, CHUNK_OVERLAP, EMBEDDING_MODEL
 
-# Load environment variables
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
@@ -39,9 +37,7 @@ def clean_text(text: str) -> str:
     """
     if not text:
         return ""
-    # Replace multiple spaces with a single space
     text = re.sub(r'[ \t]+', ' ', text)
-    # Replace multiple newlines with a double newline (for paragraph separation)
     text = re.sub(r'\n\s*\n+', '\n\n', text)
     return text.strip()
 
@@ -94,9 +90,7 @@ def extract_docx_sections(file_path: str) -> list[dict]:
             if not text:
                 continue
             
-            # Check if this paragraph is a heading
             if p.style.name.startswith("Heading"):
-                # If we have accumulated text, save it
                 if current_paragraphs:
                     section_text = "\n".join(current_paragraphs)
                     cleaned = clean_text(section_text)
@@ -111,7 +105,6 @@ def extract_docx_sections(file_path: str) -> list[dict]:
                         })
                         pseudo_page += 1
                 
-                # Start new section
                 current_section = text
                 current_paragraphs = [text]
                 char_count = len(text)
@@ -119,7 +112,6 @@ def extract_docx_sections(file_path: str) -> list[dict]:
                 current_paragraphs.append(text)
                 char_count += len(text)
                 
-                # If the page-like block gets too large, split it
                 if char_count > 1500:
                     section_text = "\n".join(current_paragraphs)
                     cleaned = clean_text(section_text)
@@ -136,7 +128,6 @@ def extract_docx_sections(file_path: str) -> list[dict]:
                     current_paragraphs = []
                     char_count = 0
         
-        # Save remaining paragraphs
         if current_paragraphs:
             section_text = "\n".join(current_paragraphs)
             cleaned = clean_text(section_text)
@@ -170,11 +161,9 @@ def extract_txt_file(file_path: str) -> list[dict]:
         if not cleaned_content:
             return []
             
-        # Try to split by Markdown headings
         sections = re.split(r'(^#+\s+.*)', cleaned_content, flags=re.MULTILINE)
         
         if len(sections) <= 1:
-            # No headings found, treat as one single block
             extracted_data.append({
                 "text": cleaned_content,
                 "metadata": {
@@ -188,18 +177,14 @@ def extract_txt_file(file_path: str) -> list[dict]:
             pseudo_page = 1
             i = 0
             
-            # The split list alternates: text-before-heading (could be empty), heading, text-after-heading...
             while i < len(sections):
                 part = sections[i].strip()
                 if not part:
                     i += 1
                     continue
                 
-                # Check if it's a heading line
                 if part.startswith("#"):
-                    # Clean up the heading to use as section title
                     current_section = part.lstrip("#").strip()
-                    # The next part will be the body text of this section
                     body_text = ""
                     if i + 1 < len(sections):
                         body_text = sections[i + 1].strip()
@@ -218,7 +203,6 @@ def extract_txt_file(file_path: str) -> list[dict]:
                         })
                         pseudo_page += 1
                 else:
-                    # Text before the first heading
                     cleaned = clean_text(part)
                     if cleaned:
                         extracted_data.append({
@@ -248,7 +232,6 @@ def split_text_recursive(text: str, max_chars: int = 1000, overlap: int = 200) -
         if len(text_to_split) <= max_chars:
             return [text_to_split]
         if not separators_list:
-            # Base case: split characters by sliding window
             chunks = []
             start = 0
             while start < len(text_to_split):
@@ -260,7 +243,6 @@ def split_text_recursive(text: str, max_chars: int = 1000, overlap: int = 200) -
         sep = separators_list[0]
         next_seps = separators_list[1:]
         
-        # Split text by separator
         if sep == "":
             parts = list(text_to_split)
         else:
@@ -274,24 +256,20 @@ def split_text_recursive(text: str, max_chars: int = 1000, overlap: int = 200) -
             part_with_sep = part if len(current_chunk) == 0 or sep == "" else sep + part
             
             if len(part_with_sep) > max_chars:
-                # Flush current chunk
                 if current_chunk:
                     chunks.append("".join(current_chunk))
                     current_chunk = []
                     current_len = 0
                 
-                # Recursively split the oversized part
                 sub_chunks = _split(part, next_seps)
                 chunks.extend(sub_chunks)
             elif current_len + len(part_with_sep) <= max_chars:
                 current_chunk.append(part_with_sep)
                 current_len += len(part_with_sep)
             else:
-                # Flush and start new chunk with overlap
                 prev_text = "".join(current_chunk)
                 chunks.append(prev_text)
                 
-                # Prepend the overlapping characters from previous chunk
                 overlap_text = prev_text[-overlap:] if len(prev_text) > overlap else prev_text
                 current_chunk = [overlap_text + part_with_sep]
                 current_len = len(current_chunk[0])
@@ -314,11 +292,9 @@ def chunk_extracted_documents(docs: list[dict], chunk_size: int = 1000, chunk_ov
         text = doc["text"]
         metadata = doc["metadata"]
         
-        # Split text into overlapping segments
         text_chunks = split_text_recursive(text, max_chars=chunk_size, overlap=chunk_overlap)
         
         for idx, chunk_text in enumerate(text_chunks):
-            # Clean up double overlaps if any edge case introduced double spaces
             chunk_text = clean_text(chunk_text)
             if not chunk_text:
                 continue
@@ -395,12 +371,10 @@ def run_ingestion():
         task_type="retrieval_document"
     )
     
-    # Delete collection if it already exists to avoid duplicate entries when indexing again
     try:
         client.delete_collection("document_knowledge_base")
         print("Cleared existing vector database collection.")
     except Exception:
-        # Collection didn't exist, ignore
         pass
         
     collection = client.create_collection(
@@ -410,13 +384,10 @@ def run_ingestion():
     )
     
     print("Step 4: Embedding and indexing chunks in ChromaDB...")
-    # ChromaDB supports batching. We will upload chunks.
-    # Note: ChromaDB's embedding function handles batching of text-embedding-004.
     ids = [f"chunk_{i}" for i in range(len(chunks))]
     documents = [chunk["text"] for chunk in chunks]
     metadatas = [chunk["metadata"] for chunk in chunks]
     
-    # Batch adding with a progress bar using tqdm
     batch_size = 100
     for i in tqdm(range(0, len(chunks), batch_size), desc="Indexing Batches"):
         end_idx = min(i + batch_size, len(chunks))

@@ -4,10 +4,8 @@ import chromadb
 from chromadb import EmbeddingFunction, Documents, Embeddings
 from dotenv import load_dotenv
 
-# Import configurations
 from src.config import DB_DIR, EMBEDDING_MODEL, GENERATIVE_MODEL
 
-# Load environment variables
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
@@ -44,17 +42,14 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
             "raw_context": []
         }
 
-    # Initialize Chroma client
     client = chromadb.PersistentClient(path=DB_DIR)
     
-    # Initialize the same Gemini embedding function used in ingestion
     embedding_fn = GeminiEmbeddingFunction(
         api_key=api_key,
         model_name=EMBEDDING_MODEL,
         task_type="retrieval_query"
     )
     
-    # Load collection
     try:
         collection = client.get_collection(
             name="document_knowledge_base",
@@ -67,7 +62,6 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
             "raw_context": []
         }
         
-    # Query ChromaDB collection
     try:
         results = collection.query(
             query_texts=[user_query],
@@ -80,7 +74,6 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
             "raw_context": []
         }
         
-    # Check if results were retrieved
     if not results or not results['documents'] or not results['documents'][0]:
         return {
             "answer": "I am sorry, but the database does not contain any matching chunks.",
@@ -92,9 +85,6 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
     citations_list = []
     raw_context = []
     
-    # ChromaDB returns 'distances'. Let's convert them to similarity scores.
-    # For Cosine distance in Chroma, distance = 1 - cosine_similarity.
-    # Therefore, similarity = 1 - distance. Let's clamp between 0.0 and 1.0.
     for doc, meta, dist in zip(results['documents'][0], results['metadatas'][0], results['distances'][0]):
         source = meta['source']
         page = meta['page']
@@ -115,7 +105,6 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
         
     context_payload = "\n\n---\n\n".join(context_blocks)
     
-    # Grounding instructions for the LLM
     system_prompt = (
         "You are an expert, precise document Q&A assistant. Your job is to answer the user's question "
         "using ONLY the provided document context below. Follow these instructions strictly:\n"

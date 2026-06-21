@@ -3,18 +3,15 @@ import sys
 import streamlit as st
 from dotenv import load_dotenv
 
-# Add the root directory to path to enable running this script directly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.query import query_rag_pipeline
 from src.ingest import run_ingestion
 from src.config import DATA_DIR, DB_DIR
 
-# Load environment variables
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
-# App title and configuration
 st.set_page_config(
     page_title="RAG Doc Q&A Bot",
     page_icon="🧠",
@@ -22,7 +19,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Load custom styling
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
@@ -201,7 +197,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Main Page Header
 st.markdown("""
 <div class="header-container">
     <div class="main-header">Document Q&A Bot</div>
@@ -209,20 +204,16 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# API Key Check
 if not api_key:
     st.error("⚠️ GEMINI_API_KEY is missing! Please configure the GEMINI_API_KEY environment variable or place it in a `.env` file at the root of the project.")
     st.info("Example `.env` file:\n\n`GEMINI_API_KEY=AIzaSyD-your-api-key`")
     st.stop()
 
-# Sidebar: System Operations & Configurations
 with st.sidebar:
     st.markdown('<div class="sidebar-title">⚙️ Control Panel</div>', unsafe_allow_html=True)
     
-    # K Value Selector
     k_val = st.slider("Context chunks to retrieve (k)", min_value=1, max_value=8, value=4, step=1)
     
-    # Ingestion Trigger
     st.markdown('<div class="sidebar-title">📂 Document Database</div>', unsafe_allow_html=True)
     
     if st.button("🚀 Re-index Knowledge Base", use_container_width=True):
@@ -233,7 +224,6 @@ with st.sidebar:
             except Exception as e:
                 st.error(f"Error during ingestion: {e}")
                 
-    # List available documents in data/
     st.markdown('<div class="sidebar-title">📁 Indexed Documents</div>', unsafe_allow_html=True)
     if os.path.exists(DATA_DIR):
         files = [f for f in os.listdir(DATA_DIR) if os.path.isfile(os.path.join(DATA_DIR, f))]
@@ -247,21 +237,17 @@ with st.sidebar:
         
     st.markdown("<br><hr><div style='text-align: center; color: #64748b; font-size: 0.75rem;'>Bookxpert Assignment<br>AI Engineering Intern</div>", unsafe_allow_html=True)
 
-# Chat Interface / Inquiries
 st.markdown("### 🔍 Ask a Question against your Knowledge Base")
 
-# Question input form
 query_input = st.text_input("Enter your question here...", placeholder="e.g., What is quantum superposition and how does it differ from classical bits?", key="query_text")
 
 if query_input:
     with st.spinner("Querying vector database and synthesizing answer..."):
         result = query_rag_pipeline(query_input, k=k_val)
         
-    # Render answer
     st.markdown("### 🧠 Grounded Answer")
     st.markdown(f'<div class="glass-card">{result["answer"]}</div>', unsafe_allow_html=True)
     
-    # Render Citations and Source Chunks
     raw_context = result.get("raw_context", [])
     if raw_context:
         st.markdown("### 📄 Retrieved Context & Citations")
@@ -272,7 +258,6 @@ if query_input:
             similarity = chunk["similarity"]
             text = chunk["text"]
             
-            # Format custom expander card
             st.markdown(f"""
             <div class="source-card">
                 <div class="badge-container">

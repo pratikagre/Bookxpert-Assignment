@@ -2,7 +2,6 @@ import os
 import sys
 from dotenv import load_dotenv
 
-# Add the root directory to path to enable running this script directly
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.query import query_rag_pipeline
@@ -39,7 +38,6 @@ def run_cli_loop():
             print("\n\033[96mAnswer:\033[0m")
             print(result["answer"])
             
-            # Print citations and context if available
             raw_context = result.get("raw_context", [])
             if raw_context:
                 print("\n" + "-" * 40)
@@ -51,7 +49,6 @@ def run_cli_loop():
                     similarity = chunk["similarity"]
                     text = chunk["text"]
                     
-                    # Truncate text for CLI print to avoid flooding screen
                     snippet = text[:150].replace('\n', ' ') + "..." if len(text) > 150 else text.replace('\n', ' ')
                     
                     print(f"[{idx+1}] {source} (Page {page}, Section: {section}) | Similarity: {similarity:.2%}")
