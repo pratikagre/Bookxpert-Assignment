@@ -13,8 +13,8 @@ venv.bak/
 # Project files
 .env
 .env.*
-# db/
-# .chroma/
+db/
+.chroma/
 
 # IDE/OS files
 .vscode/
