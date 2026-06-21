@@ -55,9 +55,9 @@ def query_rag_pipeline(user_query: str, k: int = 4) -> dict:
             name="document_knowledge_base",
             embedding_function=embedding_fn
         )
-    except Exception:
+    except Exception as e:
         return {
-            "answer": "Error: The vector database is empty or could not be found. Please run the ingestion script first (python src/ingest.py).",
+            "answer": f"Error: The vector database could not be loaded. Details: {e}",
             "citations": [],
             "raw_context": []
         }
